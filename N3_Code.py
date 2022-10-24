@@ -1,7 +1,15 @@
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+plt.rcParams["text.usetex"] = True
+
+plt.rcParams["text.latex.preamble"] = "\n".join(
+    [
+        r"\usepackage{siunitx}",
+    ]
+)
 
 filename = "sifted22-10-18-16-52.txt"  # This is the name of the file to be read
 
@@ -18,7 +26,7 @@ head_lines = 0  # Enter the number of header lines in your data file
 save_graph = True  # Enter True or False only (True if you wish to save the figure)
 CSV = False  # Is the data separated by commas (True if yes - e.g. a .csv file)
 
-fig_file = "figure.png"
+fig_file = "figure_sandbox.png"
 
 
 def fit_function(t, A0, tau, B, C, D):
@@ -143,9 +151,11 @@ plt.plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="linear fit")
 
 # plt.xlim(0,2.5)
 # plt.ylim(0,25)
-plt.xlabel("X-Axis Label (units)", fontsize=14)
-plt.ylabel("Y-Axis Label (units)", fontsize=14)
-plt.title("This is a title", fontsize=16, loc="center")
+plt.xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
+plt.ylabel("Frequency (counts)", fontsize=14)
+plt.title(
+    "Histogram of Muon Lifetimes recorded from 18/10/22", fontsize=16, loc="center"
+)
 # plt.minorticks_on()
 # plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
 plt.xticks(fontsize=12)
