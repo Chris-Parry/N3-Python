@@ -153,11 +153,12 @@ plt.yticks(fontsize=12)
 plt.legend()
 # plt.grid(True)
 
-if save_graph:
-    plt.savefig(fig_file, dpi=500)
-
-plt.show()
-
 print("\nFit Results:\n")
 for i in range(len(para)):
     print(args[i + 1], "=", para[i], "+/-", errors[i])
+
+if save_graph:
+    plt.savefig(fig_file, dpi=500)
+
+
+plt.show()
