@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+
 filename = "sifted22-10-18-16-52.txt"  # This is the name of the file to be read
 
 xColumn = 1  # Specify the column containing the x data points
@@ -20,7 +21,7 @@ CSV = False  # Is the data separated by commas (True if yes - e.g. a .csv file)
 fig_file = "figure.png"
 
 
-def fit_function(t, A0, tau, B, C):
+def fit_function(t, A0, tau, B, C, D):
     # In the brackets should be the x parameter (the dependent variable) followed by
     # the parameters of the equation to be extracted from the fit
 
@@ -30,13 +31,14 @@ def fit_function(t, A0, tau, B, C):
     )  # This extracts the names of the parameters from the function definition
 
     return (
-        A0 * np.exp(-t / (tau)) + B + C * t
+        A0 * np.exp(-t / (tau)) + B + (C * t) + (D * t**2)
     )  # This is the equation to be fitted to the data
 
 
 guess = (
     1000,
-    2,
+    2.2,
+    0,
     0,
     0,
 )  # This is the initial guess for the parameters of the fit function
@@ -98,3 +100,64 @@ x += binWidth / 2  # the x values are now the centre of the bin
 xError = np.zeros(len(x))
 xError.fill(binWidth / 2)  # the x errors are half the bin width
 yError = np.sqrt(y)  # the errors in y are the square root of the number of counts
+
+# Performs a fit calling the numpy polyfit function (polynomial order 1):
+
+# If y errors are included, they will be used as weights in the fit calculation:
+
+if include_y_errors:  # Are y errors are included?
+    para, covar = curve_fit(fit_function, x, y, p0=guess, sigma=yError)
+else:
+    para, covar = curve_fit(
+        fit_function, x, y, p0=guess
+    )  # Performs an "unweighted" fit
+
+# Extract the parameters from the fit:
+
+errors = np.sqrt(np.diag(covar))  # This extracts the errors from the covariance matrix
+
+x_fit = np.linspace(
+    min(x), max(x), 1000
+)  # Creates an x array to be used for drawing the fitted curve
+y_fit = fit_function(x_fit, *para)  # Creates a y array containing the fitted curve
+
+print("Para:", para)
+
+plt.rcParams[
+    "figure.dpi"
+] = 150  # Controls the size and resolution of the figures as displayed in Jupyter
+
+plt.errorbar(
+    x,
+    y,
+    yerr=yError,
+    xerr=xError,
+    fmt="s",
+    color="black",
+    markersize=4,
+    elinewidth=1,
+    capsize=2,
+    label="data",
+)
+plt.plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="linear fit")
+
+# plt.xlim(0,2.5)
+# plt.ylim(0,25)
+plt.xlabel("X-Axis Label (units)", fontsize=14)
+plt.ylabel("Y-Axis Label (units)", fontsize=14)
+plt.title("This is a title", fontsize=16, loc="center")
+# plt.minorticks_on()
+# plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend()
+# plt.grid(True)
+
+if save_graph:
+    plt.savefig(fig_file, dpi=500)
+
+plt.show()
+
+print("\nFit Results:\n")
+for i in range(len(para)):
+    print(args[i + 1], "=", para[i], "+/-", errors[i])
