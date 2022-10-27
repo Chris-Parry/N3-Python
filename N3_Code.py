@@ -5,8 +5,8 @@ from scipy.optimize import curve_fit
 import tkinter as tk
 from tkinter import filedialog as fd
 
-root = tk.Tk()
-root.withdraw()
+root = tk.Tk()  # This creates the root window
+root.withdraw()  # This hides the root window
 root.update()
 
 plt.rcParams["text.usetex"] = True
@@ -19,8 +19,8 @@ plt.rcParams["text.latex.preamble"] = "\n".join(
 
 filename = fd.askopenfilename()
 root.update()
-root.withdraw()
-root.iconify()
+root.withdraw()  # This is needed to close the file dialog box
+root.iconify()  # This hides the root window
 
 xColumn = 1  # Specify the column containing the x data points
 yColumn = 2  # Specify the column containing the y data points
