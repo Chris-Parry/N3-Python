@@ -2,6 +2,12 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+import tkinter as tk
+from tkinter import filedialog as fd
+
+root = tk.Tk()
+root.withdraw()
+root.update()
 
 plt.rcParams["text.usetex"] = True
 
@@ -11,7 +17,10 @@ plt.rcParams["text.latex.preamble"] = "\n".join(
     ]
 )
 
-filename = "sifted22-10-18-16-52.txt"  # This is the name of the file to be read
+filename = fd.askopenfilename()
+root.update()
+root.withdraw()
+root.iconify()
 
 xColumn = 1  # Specify the column containing the x data points
 yColumn = 2  # Specify the column containing the y data points
@@ -87,7 +96,9 @@ for data_line in raw_data:
     data = row.split()
     times[i] = float(data[0]) / 1000
     i = i + 1
-    # print(i,times[i-1],float(data[0])/1000)        #!Error will appear about index out of range if blank lines are at the end of the data file
+    print(
+        i, times[i - 1], float(data[0]) / 1000
+    )  #!Error will appear about index out of range if blank lines are at the end of the data file
 print(i, "rows of data successfully stored in array")
 raw_data.close()
 
