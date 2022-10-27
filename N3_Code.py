@@ -165,7 +165,7 @@ plt.plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="linear fit")
 plt.xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 plt.ylabel("Frequency (counts)", fontsize=14)
 plt.title(
-    "Histogram of Muon Lifetimes recorded from 18/10/22", fontsize=16, loc="center"
+    "Histogram of Muon Lifetimes recorded from 21/10/22", fontsize=16, loc="center"
 )
 # plt.minorticks_on()
 # plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
