@@ -218,12 +218,17 @@ print("Para:", para)
 
 ### Plot the data and the fit ###
 
+fig, ax = plt.subplots(1, 2, figsize=(12, 10))  # Creates a figure and an axis object
 
-plt.rcParams[
-    "figure.dpi"
-] = 150  # Controls the size and resolution of the figures as displayed in Jupyter
+plt.rcParams["figure.dpi"] = 150  # Sets the resolution of the figure (dots per inch)
 
-plt.errorbar(
+fig.suptitle(
+    "Histogram of Muon Lifetimes recorded from 21/10/22",  #! Change date depending on measurement
+    fontsize=16,
+)
+
+
+ax[0].errorbar(
     x,
     y,
     yerr=yError,
@@ -235,22 +240,51 @@ plt.errorbar(
     capsize=2,
     label="data",
 )
-plt.plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="linear fit")
-# plt.loglog((x_fit, y_fit, "-", color="", linewidth=1, label="linear fit"))
+ax[0].plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="linear fit")
 # plt.xlim(0,2.5)
 # plt.ylim(0,25)
 
-plt.xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
-plt.ylabel("Frequency (counts)", fontsize=14)
-plt.title(
-    "Histogram of Muon Lifetimes recorded from 21/10/22", fontsize=16, loc="center"
-)
+ax[0].set_ylabel("Frequency (counts)", fontsize=14)
+ax[0].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
+
 # plt.minorticks_on()
 # plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-plt.legend()
+# ax[0].xticks(fontsize=12)
+# ax[0].yticks(fontsize=12)
+ax[0].tick_params(axis="x", labelsize=12)
+ax[0].set_title("Linear graph", fontsize=14)  # Sets the title of the plot
+ax[0].legend()
 # plt.grid(True)
+
+ax[1].errorbar(
+    x,
+    y,
+    yerr=yError,
+    xerr=xError,
+    fmt="s",
+    color="black",
+    markersize=4,
+    elinewidth=1,
+    capsize=2,
+    label="data",
+)
+ax[1].plot(x_fit, y_fit, "-", color="red", linewidth=1, label="linear fit")
+ax[1].set_yscale("log")
+# plt.xlim(0,2.5)
+# plt.ylim(0,25)
+
+ax[1].set_ylabel("ln(Frequency (counts))", fontsize=14)
+ax[1].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
+
+# plt.minorticks_on()
+# plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
+# ax[1].xticks(fontsize=12)
+# ax[1].yticks(fontsize=12)
+ax[1].tick_params(axis="x", labelsize=12)
+ax[1].set_title("Log graph", fontsize=14)  # Sets the title of the plot
+ax[1].legend()
+# plt.grid(True)
+
 
 print("\nFit Results:\n")
 for i in range(len(para)):
