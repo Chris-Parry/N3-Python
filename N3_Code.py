@@ -35,7 +35,7 @@ head_lines = 0  # Enter the number of header lines in your data file
 save_graph = True  # Enter True or False only (True if you wish to save the figure)
 CSV = False  # Is the data separated by commas (True if yes - e.g. a .csv file)
 
-fig_file = "figure_sandbox.png"
+fig_file = "figure.png"
 
 
 def fit_function(t, A0, tau, B, C):
