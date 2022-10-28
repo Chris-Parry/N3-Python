@@ -38,7 +38,7 @@ CSV = False  # Is the data separated by commas (True if yes - e.g. a .csv file)
 fig_file = "figure.png"
 
 
-def fit_function(t, A0, tau, B, C):
+def fit_function(t, A0, tau, B):
     # In the brackets should be the x parameter (the dependent variable) followed by
     # the parameters of the equation to be extracted from the fit
 
@@ -47,15 +47,12 @@ def fit_function(t, A0, tau, B, C):
         fit_function.__code__.co_varnames
     )  # This extracts the names of the parameters from the function definition
 
-    return (
-        A0 * np.exp(-t / (tau)) + B + (C * t)
-    )  # This is the equation to be fitted to the data
+    return A0 * np.exp(-t / (tau)) + B  # This is the equation to be fitted to the data
 
 
 guess = (
     1000,
     2.2,
-    0,
     0,
 )  # This is the initial guess for the parameters of the fit function
 
@@ -218,7 +215,7 @@ print("Para:", para)
 
 ### Plot the data and the fit ###
 
-fig, ax = plt.subplots(1, 2, figsize=(12, 10))  # Creates a figure and an axis object
+fig, ax = plt.subplots(1, 2, figsize=(16, 8))  # Creates a figure and an axis object
 
 plt.rcParams["figure.dpi"] = 150  # Sets the resolution of the figure (dots per inch)
 
@@ -238,23 +235,35 @@ ax[0].errorbar(
     markersize=4,
     elinewidth=1,
     capsize=2,
-    label="data",
+    label="Data",
 )
-ax[0].plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="linear fit")
+
+Bvalues = np.full(len(x_fit), para[2])
+
+ax[0].plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="Fit")
+ax[0].plot(x_fit, Bvalues, "-", color="green", linewidth=1, label="Background")
+ax[0].axhline(y=0, linewidth=0.5, color="black")
+ax[0].axvline(x=0, linewidth=0.5, color="black")
 # plt.xlim(0,2.5)
 # plt.ylim(0,25)
 
 ax[0].set_ylabel("Frequency (counts)", fontsize=14)
 ax[0].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 
-# plt.minorticks_on()
+ax[0].minorticks_on()
 # plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
 # ax[0].xticks(fontsize=12)
 # ax[0].yticks(fontsize=12)
 ax[0].tick_params(axis="x", labelsize=12)
 ax[0].set_title("Linear graph", fontsize=14)  # Sets the title of the plot
 ax[0].legend()
-# plt.grid(True)
+ax[0].grid(
+    visible=True,
+    which="both",
+    axis="both",
+    linestyle="--",
+    linewidth=0.5,
+)
 
 ax[1].errorbar(
     x,
@@ -266,24 +275,33 @@ ax[1].errorbar(
     markersize=4,
     elinewidth=1,
     capsize=2,
-    label="data",
+    label="Data",
 )
-ax[1].plot(x_fit, y_fit, "-", color="red", linewidth=1, label="linear fit")
+ax[1].plot(x_fit, y_fit, "-", color="red", linewidth=1, label="Fit")
+ax[1].plot(x_fit, Bvalues, "-", color="green", linewidth=1, label="Background")
 ax[1].set_yscale("log")
+ax[1].axhline(y=0, linewidth=0.5, color="black")
+ax[1].axvline(x=0, linewidth=0.5, color="black")
 # plt.xlim(0,2.5)
 # plt.ylim(0,25)
 
 ax[1].set_ylabel("ln(Frequency (counts))", fontsize=14)
 ax[1].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 
-# plt.minorticks_on()
+
 # plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
 # ax[1].xticks(fontsize=12)
 # ax[1].yticks(fontsize=12)
 ax[1].tick_params(axis="x", labelsize=12)
 ax[1].set_title("Log graph", fontsize=14)  # Sets the title of the plot
 ax[1].legend()
-# plt.grid(True)
+ax[1].grid(
+    visible=True,
+    which="major",
+    axis="both",
+    linestyle="--",
+    linewidth=0.5,
+)
 
 
 print("\nFit Results:\n")
