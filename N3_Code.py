@@ -38,7 +38,7 @@ CSV = False  # Is the data separated by commas (True if yes - e.g. a .csv file)
 fig_file = "figure_sandbox.png"
 
 
-def fit_function(t, A0, tau, B, C, D):
+def fit_function(t, A0, tau, B, C):
     # In the brackets should be the x parameter (the dependent variable) followed by
     # the parameters of the equation to be extracted from the fit
 
@@ -48,14 +48,13 @@ def fit_function(t, A0, tau, B, C, D):
     )  # This extracts the names of the parameters from the function definition
 
     return (
-        A0 * np.exp(-t / (tau)) + B + (C * t) + (D * t**2)
+        A0 * np.exp(-t / (tau)) + B + (C * t)
     )  # This is the equation to be fitted to the data
 
 
 guess = (
     1000,
     2.2,
-    0,
     0,
     0,
 )  # This is the initial guess for the parameters of the fit function
@@ -78,6 +77,80 @@ else:
         )
 
 
+raw_data = open(filename, "r")  # Open the data file for input
+
+lines = 0  # This counts the number of data lines that have been read
+first = True  # A flag is set for the first non-blank line found
+warning = False  # A warning flag for a unexpected number of data points in a row
+blank_lines = 0  # This counts the number of blank lines found
+
+# Skip any header lines
+if header:  # Are there any header rows?
+    for i in range(head_lines):
+        next(raw_data)  # Skip each header row
+
+# Now we loop through every line in the file
+
+for data_line in raw_data:  # loops through the file, one line at a time
+    row = (
+        data_line.strip()
+    )  # "row" is now a string variable contains the text of that line
+
+    # check for blank lines
+    if row == "":  # is it blank?
+        blank_lines = blank_lines + 1  # counts the number of blank lines
+        continue  # skip straight to the next line (i.e. the next step of the loop)
+    elif CSV and row.strip(",") == "":  # is it just commas?
+        blank_lines = blank_lines + 1  # counts the number of blank lines
+        continue  # skip straight to the next line (i.e. the next step of the loop)
+
+    # for a non-blank line, split the line into columns
+    lines = lines + 1  # counts the number of lines of data
+    if CSV:  # is it a CSV?
+        data = row.split(
+            ","
+        )  # split line into data points ("data" is now a list of strings)
+    else:  # it's not a CSV
+        data = (
+            row.split()
+        )  # split line into data points ("data" is now a list of strings)
+    num_values = len(data)  # counts the number of data points in the line
+
+    # Checks the number of data points is the same as in the last line
+
+    if first:  # Is it the first line? (no check possible)
+        first = False  # Resets the flag
+        first_row = row  # Stores the first row of data
+    elif (
+        num_values != num_last
+    ):  # checks if number of data points is different from last row
+        warning = True  # Sets a warning flag
+    num_last = (
+        num_values  # Stores current number of data points for the next comparison
+    )
+    last_row = row  # Stores the most recent (i.e. last) row of data
+
+# Now we have finished reading the file
+
+raw_data.close()  # Close the data file
+
+# Tell the user what we have found
+if warning:
+    print(
+        "\n \n WARNING \n WARNING - COLUMNS do not have the same number of data points \n WARNING\n"
+    )
+print("\n", lines, "rows of data, in", num_last, "columns, found in file")
+print(
+    "",
+    blank_lines,
+    "blank lines found in file, and",
+    head_lines,
+    "lines of headers skipped",
+)
+print("\n First data row:", first_row)
+print(" Last data row:", last_row)
+
+
 raw_data = open(filename, "r")
 lines = 0
 
@@ -96,9 +169,9 @@ for data_line in raw_data:
     data = row.split()
     times[i] = float(data[0]) / 1000
     i = i + 1
-    print(
-        i, times[i - 1], float(data[0]) / 1000
-    )  #!Error will appear about index out of range if blank lines are at the end of the data file
+    # print(
+    #     i, times[i - 1], float(data[0]) / 1000
+    # )  #!Error will appear about index out of range if blank lines are at the end of the data file
 print(i, "rows of data successfully stored in array")
 raw_data.close()
 
@@ -142,6 +215,10 @@ y_fit = fit_function(x_fit, *para)  # Creates a y array containing the fitted cu
 
 print("Para:", para)
 
+
+### Plot the data and the fit ###
+
+
 plt.rcParams[
     "figure.dpi"
 ] = 150  # Controls the size and resolution of the figures as displayed in Jupyter
@@ -159,9 +236,10 @@ plt.errorbar(
     label="data",
 )
 plt.plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="linear fit")
-
+# plt.loglog((x_fit, y_fit, "-", color="", linewidth=1, label="linear fit"))
 # plt.xlim(0,2.5)
 # plt.ylim(0,25)
+
 plt.xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 plt.ylabel("Frequency (counts)", fontsize=14)
 plt.title(
