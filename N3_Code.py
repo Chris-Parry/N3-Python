@@ -237,14 +237,20 @@ ax[0].errorbar(
     capsize=2,
     label="Data",
 )
+
+Bvalues = np.full(len(x_fit), para[2])
+
 ax[0].plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="Fit")
+ax[0].plot(x_fit, Bvalues, "-", color="green", linewidth=1, label="Background")
+ax[0].axhline(y=0, linewidth=0.5, color="black")
+ax[0].axvline(x=0, linewidth=0.5, color="black")
 # plt.xlim(0,2.5)
 # plt.ylim(0,25)
 
 ax[0].set_ylabel("Frequency (counts)", fontsize=14)
 ax[0].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 
-# plt.minorticks_on()
+ax[0].minorticks_on()
 # plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
 # ax[0].xticks(fontsize=12)
 # ax[0].yticks(fontsize=12)
@@ -272,14 +278,17 @@ ax[1].errorbar(
     label="Data",
 )
 ax[1].plot(x_fit, y_fit, "-", color="red", linewidth=1, label="Fit")
+ax[1].plot(x_fit, Bvalues, "-", color="green", linewidth=1, label="Background")
 ax[1].set_yscale("log")
+ax[1].axhline(y=0, linewidth=0.5, color="black")
+ax[1].axvline(x=0, linewidth=0.5, color="black")
 # plt.xlim(0,2.5)
 # plt.ylim(0,25)
 
 ax[1].set_ylabel("ln(Frequency (counts))", fontsize=14)
 ax[1].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 
-# plt.minorticks_on()
+
 # plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
 # ax[1].xticks(fontsize=12)
 # ax[1].yticks(fontsize=12)
