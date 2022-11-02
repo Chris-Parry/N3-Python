@@ -5,8 +5,8 @@ from scipy.optimize import curve_fit
 import tkinter as tk
 from tkinter import filedialog as fd
 
-root = tk.Tk()  # This creates the root window
-root.withdraw()  # This hides the root window
+root = tk.Tk()
+root.withdraw()
 root.update()
 
 plt.rcParams["text.usetex"] = True
@@ -19,13 +19,13 @@ plt.rcParams["text.latex.preamble"] = "\n".join(
 
 filename = fd.askopenfilename()
 root.update()
-root.withdraw()  # This is needed to close the file dialog box
-root.iconify()  # This hides the root window
+root.withdraw()
+root.iconify()
 
-xColumn = 1  # Specify the column containing the x data points
-yColumn = 2  # Specify the column containing the y data points
-include_x_errors = True  # Enter True or False only (True if x errors needed on plot)
-include_y_errors = True  # Enter True or False only (True if y errors needed on plot)
+xColumn = 1
+yColumn = 2
+include_x_errors = True
+include_y_errors = True
 xErrColumn = 0  # Specify the column containing the x errors
 yErrColumn = 3  # Specify the column containing the y errors
 header = (
@@ -61,37 +61,35 @@ fit_function(
 )  # This is needed to extract the names of the parameters from the function definition
 
 
-if len(args) - 1 != len(
-    guess
-):  # Checks the number of parameters and the number of guesses
+if len(args) - 1 != len(guess):
     print("ERROR - mismatch between number of parameters and number of guesses")
 else:
     print("This code will fit the specified function and extract")
     print(len(args) - 1, "parameters with the following inital guesses:\n")
-    for i in range(len(guess)):  # For each parameter....
+    for i in range(len(guess)):
         print(
-            args[i + 1], "=", guess[i]  # Prints the name of the parameter and its guess
+            args[i + 1], "=", guess[i]
         )
 
 
-raw_data = open(filename, "r")  # Open the data file for input
+raw_data = open(filename, "r")
 
-lines = 0  # This counts the number of data lines that have been read
-first = True  # A flag is set for the first non-blank line found
-warning = False  # A warning flag for a unexpected number of data points in a row
-blank_lines = 0  # This counts the number of blank lines found
+lines = 0
+first = True
+warning = False
+blank_lines = 0
 
 # Skip any header lines
-if header:  # Are there any header rows?
+if header:
     for i in range(head_lines):
-        next(raw_data)  # Skip each header row
+        next(raw_data)
 
 # Now we loop through every line in the file
-
-for data_line in raw_data:  # loops through the file, one line at a time
+for data_line in raw_data:
     row = (
         data_line.strip()
-    )  # "row" is now a string variable contains the text of that line
+    )  
+    # "row" is now a string variable contains the text of that line
 
     # check for blank lines
     if row == "":  # is it blank?
@@ -103,18 +101,17 @@ for data_line in raw_data:  # loops through the file, one line at a time
 
     # for a non-blank line, split the line into columns
     lines = lines + 1  # counts the number of lines of data
-    if CSV:  # is it a CSV?
+    if CSV:
         data = row.split(
             ","
         )  # split line into data points ("data" is now a list of strings)
-    else:  # it's not a CSV
+    else:
         data = (
             row.split()
         )  # split line into data points ("data" is now a list of strings)
-    num_values = len(data)  # counts the number of data points in the line
+    num_values = len(data)
 
     # Checks the number of data points is the same as in the last line
-
     if first:  # Is it the first line? (no check possible)
         first = False  # Resets the flag
         first_row = row  # Stores the first row of data
@@ -127,33 +124,26 @@ for data_line in raw_data:  # loops through the file, one line at a time
     )
     last_row = row  # Stores the most recent (i.e. last) row of data
 
-# Now we have finished reading the file
 
-raw_data.close()  # Close the data file
+raw_data.close()
 
-# Tell the user what we have found
 if warning:
     print(
         "\n \n WARNING \n WARNING - COLUMNS do not have the same number of data points \n WARNING\n"
     )
-print("\n", lines, "rows of data, in", num_last, "columns, found in file")
+print(f"\n {lines} rows of data, in {num_last} columns, found in file")
 print(
-    "",
-    blank_lines,
-    "blank lines found in file, and",
-    head_lines,
-    "lines of headers skipped",
+    f"\n {blank_lines} blank lines found in file, and {head_lines} lines of headers skipped"
 )
 print("\n First data row:", first_row)
 print(" Last data row:", last_row)
 
 
 raw_data = open(filename, "r")
-lines = 0
 
-i = 0
+lines = 0
 for data_line in raw_data:
-    lines += 1  # Count the number of lines in the file
+    lines += 1
 raw_data.seek(0)
 # print(lines)
 
@@ -161,6 +151,7 @@ raw_data.seek(0)
 times = np.zeros(lines)
 
 # Read the data: store all the time values in an array
+i = 0
 for data_line in raw_data:
     row = data_line.strip()
     data = row.split()
@@ -170,6 +161,7 @@ for data_line in raw_data:
     #     i, times[i - 1], float(data[0]) / 1000
     # )  #!Error will appear about index out of range if blank lines are at the end of the data file
 print(i, "rows of data successfully stored in array")
+
 raw_data.close()
 
 # converts to a histogram with X (first number) bins in the range (Y,Z) microseconds
@@ -180,10 +172,10 @@ if min(y) == 0:
 
 # converts the bin "edges" in x values that correspond to the centre of the bin
 x = edges[:-1].copy()
-binWidth = x[1] - x[0]  # the width of the bins
+binWidth = x[1] - x[0]
 x += binWidth / 2  # the x values are now the centre of the bin
 
-# y and x are now arrays of the histogram values (y) and times in microseconds (x). This can now be plotted.
+# y and x are now arrays of the histogram values (y) and times in microseconds (x).
 
 
 xError = np.zeros(len(x))
@@ -191,9 +183,7 @@ xError.fill(binWidth / 2)  # the x errors are half the bin width
 yError = np.sqrt(y)  # the errors in y are the square root of the number of counts
 
 # Performs a fit calling the numpy polyfit function (polynomial order 1):
-
-# If y errors are included, they will be used as weights in the fit calculation:
-
+    # If y errors are included, they will be used as weights in the fit calculation:
 if include_y_errors:  # Are y errors are included?
     para, covar = curve_fit(fit_function, x, y, p0=guess, sigma=yError)
 else:
@@ -202,9 +192,7 @@ else:
     )  # Performs an "unweighted" fit
 
 # Extract the parameters from the fit:
-
 errors = np.sqrt(np.diag(covar))  # This extracts the errors from the covariance matrix
-
 x_fit = np.linspace(
     min(x), max(x), 1000
 )  # Creates an x array to be used for drawing the fitted curve
@@ -214,8 +202,7 @@ print("Para:", para)
 
 
 ### Plot the data and the fit ###
-
-fig, ax = plt.subplots(1, 2, figsize=(16, 8))  # Creates a figure and an axis object
+fig, ax = plt.subplots(1, 2, figsize=(16, 8))
 
 plt.rcParams["figure.dpi"] = 150  # Sets the resolution of the figure (dots per inch)
 
@@ -223,7 +210,6 @@ fig.suptitle(
     "Histogram of Muon Lifetimes recorded from 21/10/22",  #! Change date depending on measurement
     fontsize=16,
 )
-
 
 ax[0].errorbar(
     x,
@@ -255,7 +241,7 @@ ax[0].minorticks_on()
 # ax[0].xticks(fontsize=12)
 # ax[0].yticks(fontsize=12)
 ax[0].tick_params(axis="x", labelsize=12)
-ax[0].set_title("Linear graph", fontsize=14)  # Sets the title of the plot
+ax[0].set_title("Linear graph", fontsize=14)
 ax[0].legend()
 ax[0].grid(
     visible=True,
@@ -293,7 +279,7 @@ ax[1].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 # ax[1].xticks(fontsize=12)
 # ax[1].yticks(fontsize=12)
 ax[1].tick_params(axis="x", labelsize=12)
-ax[1].set_title("Log graph", fontsize=14)  # Sets the title of the plot
+ax[1].set_title("Log graph", fontsize=14)
 ax[1].legend()
 ax[1].grid(
     visible=True,
