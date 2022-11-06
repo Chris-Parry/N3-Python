@@ -57,7 +57,7 @@ guess = (
 
 fit_function(
     1, *guess
-)  # This is needed to extract the names of the parameters from the function definition
+)  # This is needed to generate the arguments for the next bit
 
 
 if len(args) - 1 != len(guess):
