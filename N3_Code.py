@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import tkinter as tk
@@ -42,7 +41,7 @@ def fit_function(t, A0, tau, B):
     # In the brackets should be the x parameter (the dependent variable) followed by
     # the parameters of the equation to be extracted from the fit
 
-    global args  # This is needed to allow the function to access the global variable args
+    global args
     args = (
         fit_function.__code__.co_varnames
     )  # This extracts the names of the parameters from the function definition
@@ -67,9 +66,7 @@ else:
     print("This code will fit the specified function and extract")
     print(len(args) - 1, "parameters with the following inital guesses:\n")
     for i in range(len(guess)):
-        print(
-            args[i + 1], "=", guess[i]
-        )
+        print(args[i + 1], "=", guess[i])
 
 
 raw_data = open(filename, "r")
@@ -78,6 +75,9 @@ lines = 0
 first = True
 warning = False
 blank_lines = 0
+num_last = None
+first_row = None
+last_row = None
 
 # Skip any header lines
 if header:
@@ -86,9 +86,7 @@ if header:
 
 # Now we loop through every line in the file
 for data_line in raw_data:
-    row = (
-        data_line.strip()
-    )  
+    row = data_line.strip()
     # "row" is now a string variable contains the text of that line
 
     # check for blank lines
@@ -129,11 +127,16 @@ raw_data.close()
 
 if warning:
     print(
-        "\n \n WARNING \n WARNING - COLUMNS do not have the same number of data points \n WARNING\n"
+        """
+        \n \n WARNING
+        \n WARNING - COLUMNS do not have the same number of data points
+        \n WARNING\n
+        """
     )
 print(f"\n {lines} rows of data, in {num_last} columns, found in file")
 print(
-    f"\n {blank_lines} blank lines found in file, and {head_lines} lines of headers skipped"
+    f"\n {blank_lines} blank lines found in file, and {head_lines}"
+    "lines of headers skipped"
 )
 print("\n First data row:", first_row)
 print(" Last data row:", last_row)
@@ -159,7 +162,7 @@ for data_line in raw_data:
     i = i + 1
     # print(
     #     i, times[i - 1], float(data[0]) / 1000
-    # )  #!Error will appear about index out of range if blank lines are at the end of the data file
+    # )  #!Error if blank lines are at the end of the data file
 print(i, "rows of data successfully stored in array")
 
 raw_data.close()
@@ -183,7 +186,7 @@ xError.fill(binWidth / 2)  # the x errors are half the bin width
 yError = np.sqrt(y)  # the errors in y are the square root of the number of counts
 
 # Performs a fit calling the numpy polyfit function (polynomial order 1):
-    # If y errors are included, they will be used as weights in the fit calculation:
+# If y errors are included, they will be used as weights in the fit calculation:
 if include_y_errors:  # Are y errors are included?
     para, covar = curve_fit(fit_function, x, y, p0=guess, sigma=yError)
 else:
@@ -201,13 +204,13 @@ y_fit = fit_function(x_fit, *para)  # Creates a y array containing the fitted cu
 print("Para:", para)
 
 
-### Plot the data and the fit ###
+# Plot the data and the fit
 fig, ax = plt.subplots(1, 2, figsize=(16, 8))
 
 plt.rcParams["figure.dpi"] = 150  # Sets the resolution of the figure (dots per inch)
 
 fig.suptitle(
-    "Histogram of Muon Lifetimes recorded from 21/10/22",  #! Change date depending on measurement
+    "Histogram of Muon Lifetimes recorded from 21/10/22",  #! Change date
     fontsize=16,
 )
 
@@ -237,7 +240,15 @@ ax[0].set_ylabel("Frequency (counts)", fontsize=14)
 ax[0].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 
 ax[0].minorticks_on()
-# plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
+# plt.text(
+#     7.5,
+#     95,
+#     "Here is some text on the graph",
+#     color="red",
+#     fontsize=10,
+#     weight="normal",
+#     fontstyle="italic",
+# )
 # ax[0].xticks(fontsize=12)
 # ax[0].yticks(fontsize=12)
 ax[0].tick_params(axis="x", labelsize=12)
@@ -275,7 +286,15 @@ ax[1].set_ylabel("ln(Frequency (counts))", fontsize=14)
 ax[1].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 
 
-# plt.text(7.5,95,"Here is some text on the graph",color='red',fontsize=10,weight="normal",fontstyle="italic")
+# plt.text(
+#     7.5,
+#     95,
+#     "Here is some text on the graph",
+#     color="red",
+#     fontsize=10,
+#     weight="normal",
+#     fontstyle="italic",
+# )
 # ax[1].xticks(fontsize=12)
 # ax[1].yticks(fontsize=12)
 ax[1].tick_params(axis="x", labelsize=12)
