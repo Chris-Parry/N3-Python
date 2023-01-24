@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.widgets import CheckButtons
 from scipy.optimize import curve_fit
 import tkinter as tk
 from tkinter import filedialog as fd
@@ -21,17 +22,17 @@ root.update()
 root.withdraw()
 root.iconify()
 
-xColumn = 1
-yColumn = 2
+x_column = 1
+y_column = 2
 include_x_errors = True
 include_y_errors = True
-xErrColumn = 0  # Specify the column containing the x errors
-yErrColumn = 3  # Specify the column containing the y errors
+x_err_column = 0  # Specify the column containing the x errors
+y_err_column = 3  # Specify the column containing the y errors
 header = (
     False  # Does your data file contain one of more header lines (e.g. column titles)
 )
 head_lines = 0  # Enter the number of header lines in your data file
-save_graph = True  # Enter True or False only (True if you wish to save the figure)
+save_graph = True  # True if you wish to save the figure, False if not
 CSV = False  # Is the data separated by commas (True if yes - e.g. a .csv file)
 
 fig_file = "figure.png"
@@ -46,18 +47,16 @@ def fit_function(t, A0, tau, B):
         fit_function.__code__.co_varnames
     )  # This extracts the names of the parameters from the function definition
 
-    return A0 * np.exp(-t / (tau)) + B  # This is the equation to be fitted to the data
+    return A0 * np.exp(-t / (tau)) + B
 
 
 guess = (
     1000,
     2.2,
     0,
-)  # This is the initial guess for the parameters of the fit function
+)
 
-fit_function(
-    1, *guess
-)  # This is needed to generate the arguments for the next bit
+fit_function(1, *guess)
 
 
 if len(args) - 1 != len(guess):
@@ -148,9 +147,7 @@ lines = 0
 for data_line in raw_data:
     lines += 1
 raw_data.seek(0)
-# print(lines)
 
-# Create an array to store all the time values
 times = np.zeros(lines)
 
 # Read the data: store all the time values in an array
@@ -175,20 +172,20 @@ if min(y) == 0:
 
 # converts the bin "edges" in x values that correspond to the centre of the bin
 x = edges[:-1].copy()
-binWidth = x[1] - x[0]
-x += binWidth / 2  # the x values are now the centre of the bin
+bin_width = x[1] - x[0]
+x += bin_width / 2  # the x values are now the centre of the bin
 
 # y and x are now arrays of the histogram values (y) and times in microseconds (x).
 
 
-xError = np.zeros(len(x))
-xError.fill(binWidth / 2)  # the x errors are half the bin width
-yError = np.sqrt(y)  # the errors in y are the square root of the number of counts
+x_error = np.zeros(len(x))
+x_error.fill(bin_width / 2)  # the x errors are half the bin width
+y_error = np.sqrt(y)  # the errors in y are the square root of the number of counts
 
 # Performs a fit calling the numpy polyfit function (polynomial order 1):
 # If y errors are included, they will be used as weights in the fit calculation:
 if include_y_errors:  # Are y errors are included?
-    para, covar = curve_fit(fit_function, x, y, p0=guess, sigma=yError)
+    para, covar = curve_fit(fit_function, x, y, p0=guess, sigma=y_error)
 else:
     para, covar = curve_fit(
         fit_function, x, y, p0=guess
@@ -199,7 +196,7 @@ errors = np.sqrt(np.diag(covar))  # This extracts the errors from the covariance
 x_fit = np.linspace(
     min(x), max(x), 1000
 )  # Creates an x array to be used for drawing the fitted curve
-y_fit = fit_function(x_fit, *para)  # Creates a y array containing the fitted curve
+y_fit = fit_function(x_fit, *para)
 
 print("Para:", para)
 
@@ -210,15 +207,15 @@ fig, ax = plt.subplots(1, 2, figsize=(16, 8))
 plt.rcParams["figure.dpi"] = 150  # Sets the resolution of the figure (dots per inch)
 
 fig.suptitle(
-    "Histogram of Muon Lifetimes recorded from 21/10/22",  #! Change date
+    "Histogram of Muon Lifetimes recorded from 21/10/22",  # ! Change date
     fontsize=16,
 )
 
 ax[0].errorbar(
     x,
     y,
-    yerr=yError,
-    xerr=xError,
+    yerr=y_error,
+    xerr=x_error,
     fmt="s",
     color="black",
     markersize=4,
@@ -227,30 +224,24 @@ ax[0].errorbar(
     label="Data",
 )
 
-Bvalues = np.full(len(x_fit), para[2])
+B_values = np.full(len(x_fit), para[2])
 
-ax[0].plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="Fit")
-ax[0].plot(x_fit, Bvalues, "-", color="green", linewidth=1, label="Background")
+pl0_0 = ax[0].plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="Fit")
+pl0_1 = ax[0].plot(x_fit, B_values, "-", color="green", linewidth=1, label="Background")
+pl0_2 = ax[0].plot(
+    x_fit, y_fit - B_values, "-", color="red", linewidth=1, label="Signal"
+)
+
+plots0 = [pl0_0, pl0_1, pl0_2]
+
+
 ax[0].axhline(y=0, linewidth=0.5, color="black")
 ax[0].axvline(x=0, linewidth=0.5, color="black")
-# plt.xlim(0,2.5)
-# plt.ylim(0,25)
 
 ax[0].set_ylabel("Frequency (counts)", fontsize=14)
 ax[0].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
 
 ax[0].minorticks_on()
-# plt.text(
-#     7.5,
-#     95,
-#     "Here is some text on the graph",
-#     color="red",
-#     fontsize=10,
-#     weight="normal",
-#     fontstyle="italic",
-# )
-# ax[0].xticks(fontsize=12)
-# ax[0].yticks(fontsize=12)
 ax[0].tick_params(axis="x", labelsize=12)
 ax[0].set_title("Linear graph", fontsize=14)
 ax[0].legend()
@@ -262,11 +253,12 @@ ax[0].grid(
     linewidth=0.5,
 )
 
+
 ax[1].errorbar(
     x,
     y,
-    yerr=yError,
-    xerr=xError,
+    yerr=y_error,
+    xerr=x_error,
     fmt="s",
     color="black",
     markersize=4,
@@ -274,29 +266,16 @@ ax[1].errorbar(
     capsize=2,
     label="Data",
 )
-ax[1].plot(x_fit, y_fit, "-", color="red", linewidth=1, label="Fit")
-ax[1].plot(x_fit, Bvalues, "-", color="green", linewidth=1, label="Background")
+pl1_0 = ax[1].plot(x_fit, y_fit, "-", color="blue", linewidth=1, label="Fit")
+pl1_1 = ax[1].plot(x_fit, B_values, "-", color="green", linewidth=1, label="Background")
+pl1_2 = ax[1].plot(
+    x_fit, y_fit - B_values, "-", color="red", linewidth=1, label="Signal"
+)
 ax[1].set_yscale("log")
 ax[1].axhline(y=0, linewidth=0.5, color="black")
 ax[1].axvline(x=0, linewidth=0.5, color="black")
-# plt.xlim(0,2.5)
-# plt.ylim(0,25)
-
 ax[1].set_ylabel("ln(Frequency (counts))", fontsize=14)
 ax[1].set_xlabel(r"Muon Lifetime (\unit{\micro\second})", fontsize=14)
-
-
-# plt.text(
-#     7.5,
-#     95,
-#     "Here is some text on the graph",
-#     color="red",
-#     fontsize=10,
-#     weight="normal",
-#     fontstyle="italic",
-# )
-# ax[1].xticks(fontsize=12)
-# ax[1].yticks(fontsize=12)
 ax[1].tick_params(axis="x", labelsize=12)
 ax[1].set_title("Log graph", fontsize=14)
 ax[1].legend()
@@ -318,3 +297,5 @@ if save_graph:
 
 
 plt.show()
+
+# TODO Add checkboxes for different graphs
